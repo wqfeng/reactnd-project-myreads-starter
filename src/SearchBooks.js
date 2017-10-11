@@ -1,40 +1,34 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
-// import PropTypes from 'prop-types'
-// import escapeRegExp from 'escape-string-regexp'
-// import sortBy from 'sort-by'
+import { Link } from 'react-router-dom';
+import * as BooksAPI from './BooksAPI';
+import PropTypes from 'prop-types'
 
 class SearchBooks extends Component {
   static propTypes = {
-    // contacts: PropTypes.array.isRequired,
-    // onDeleteContact: PropTypes.func.isRequired
+    moveBook: PropTypes.func.isRequired
   }
 
   state = {
-    query: ''
+    query: '',
+    books: []
+  }
+  
+  searchBooks = (query) => {
+    BooksAPI.search(query, 20).then(books =>{
+        console.log(JSON.stringify(books))
+      this.setState({ books })
+    })
   }
 
   updateQuery = (query) => {
-    this.setState({ query: query.trim() })
-  }
-
-  clearQuery = () => {
-    this.setState({ query: '' })
+    this.setState({ 
+        query: query.trim()
+     }, this.searchBooks(query))
   }
 
   render() {
-    const { reading, toRead, read } = this.props
-    // const { query } = this.state
-
-    // let showingContacts
-    // if (query) {
-    //   const match = new RegExp(escapeRegExp(query), 'i')
-    //   showingContacts = contacts.filter((contact) => match.test(contact.name))
-    // } else {
-    //   showingContacts = contacts
-    // }
-
-    // showingContacts.sort(sortBy('name'))
+    const { moveBook } = this.props
+    const { query, books } = this.state
 
     return (
         
@@ -50,12 +44,40 @@ class SearchBooks extends Component {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-                <input type="text" placeholder="Search by title or author"/>
+                <input
+                    type="text"
+                    placeholder="Search by title or author" 
+                    value={query}
+                    onChange={(event) => this.updateQuery(event.target.value)}
+                />
 
               </div>
             </div>
             <div className="search-books-results">
-              <ol className="books-grid"></ol>
+              <ol className="books-grid">
+                {books.map(book => (
+                    <li key={book.id}>
+                        <div className="book">
+                        <div className="book-top">
+                            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
+                            <div className="book-shelf-changer">
+                            <select value={book.shelf? book.shelf: "none"} onChange={(event) =>{
+                                moveBook(book, event.target.value)
+                            }}>
+                                <option value="none" disabled>Move to...</option>
+                                <option value="currentlyReading">Currently Reading</option>
+                                <option value="wantToRead">Want to Read</option>
+                                <option value="read">Read</option>
+                                <option value="none">None</option>
+                            </select>
+                            </div>
+                        </div>
+                        <div className="book-title">{book.title}</div>
+                        <div className="book-authors">{book.authors.join(", ")}</div>
+                        </div>
+                    </li>
+                ))}
+              </ol>
             </div>
           </div>
 
