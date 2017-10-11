@@ -1,48 +1,20 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
-// import PropTypes from 'prop-types'
-// import escapeRegExp from 'escape-string-regexp'
-// import sortBy from 'sort-by'
+import PropTypes from 'prop-types'
 
 class ListBooks extends Component {
   static propTypes = {
-    // contacts: PropTypes.array.isRequired,
-    // onDeleteContact: PropTypes.func.isRequired
-  }
-
-  state = {
-    query: ''
-  }
-
-  updateQuery = (query) => {
-    this.setState({ query: query.trim() })
-  }
-
-  clearQuery = () => {
-    this.setState({ query: '' })
+    books: PropTypes.array.isRequired,
+    moveBook: PropTypes.func.isRequired
   }
 
   render() {
-      const { books } = this.props
-      const reading = books.filter(book => book['shelf'] === "currentlyReading")
-      const toRead = books.filter(book => book['shelf'] === "wantToRead")
-      const read = books.filter(book => book['shelf'] === "read")
-
-    // const { query } = this.state
-
-    // let showingContacts
-    // if (query) {
-    //   const match = new RegExp(escapeRegExp(query), 'i')
-    //   showingContacts = contacts.filter((contact) => match.test(contact.name))
-    // } else {
-    //   showingContacts = contacts
-    // }
-
-    // showingContacts.sort(sortBy('name'))
+    const { books, moveBook } = this.props
+    const reading = books.filter(book => book['shelf'] === "currentlyReading")
+    const toRead = books.filter(book => book['shelf'] === "wantToRead")
+    const read = books.filter(book => book['shelf'] === "read")
 
     return (
-        
-
         <div className="list-books">
             <div className="list-books-title">
               <h1>MyReads</h1>
@@ -54,12 +26,14 @@ class ListBooks extends Component {
                   <div className="bookshelf-books">
                     <ol className="books-grid">
                         {reading.map(book => (
-                            <li key={book.title}>
+                            <li key={book.id}>
                                 <div className="book">
                                 <div className="book-top">
                                     <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
                                     <div className="book-shelf-changer">
-                                    <select>
+                                    <select value="currentlyReading" onChange={(event) =>{
+                                        moveBook(book, event.target.value)
+                                    }}>
                                         <option value="none" disabled>Move to...</option>
                                         <option value="currentlyReading">Currently Reading</option>
                                         <option value="wantToRead">Want to Read</option>
@@ -82,12 +56,14 @@ class ListBooks extends Component {
                   <div className="bookshelf-books">
                     <ol className="books-grid">
                       {toRead.map(book => (
-                            <li key={book.title}>
+                            <li key={book.id}>
                                 <div className="book">
                                 <div className="book-top">
                                     <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
                                     <div className="book-shelf-changer">
-                                    <select>
+                                    <select value="wantToRead" onChange={(event) =>{
+                                        moveBook(book, event.target.value)
+                                    }}>
                                         <option value="none" disabled>Move to...</option>
                                         <option value="currentlyReading">Currently Reading</option>
                                         <option value="wantToRead">Want to Read</option>
@@ -109,12 +85,14 @@ class ListBooks extends Component {
                   <div className="bookshelf-books">
                     <ol className="books-grid">
                       {read.map(book => (
-                            <li key={book.title}>
+                            <li key={book.id}>
                                 <div className="book">
                                 <div className="book-top">
                                     <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
                                     <div className="book-shelf-changer">
-                                    <select>
+                                    <select value="read" onChange={(event) =>{
+                                        moveBook(book, event.target.value)
+                                    }}>
                                         <option value="none" disabled>Move to...</option>
                                         <option value="currentlyReading">Currently Reading</option>
                                         <option value="wantToRead">Want to Read</option>
