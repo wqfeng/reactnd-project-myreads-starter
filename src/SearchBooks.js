@@ -5,7 +5,8 @@ import PropTypes from 'prop-types'
 
 class SearchBooks extends Component {
   static propTypes = {
-    moveBook: PropTypes.func.isRequired
+    moveBook: PropTypes.func.isRequired,
+    booksOnShelf: PropTypes.array.isRequired
   }
 
   state = {
