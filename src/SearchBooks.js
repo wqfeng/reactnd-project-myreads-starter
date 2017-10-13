@@ -10,25 +10,38 @@ class SearchBooks extends Component {
 
   state = {
     query: '',
-    books: []
+    searchResults: []
   }
   
-  searchBooks = (query) => {
+  searchBooks = (query, booksOnShelf) => {
     BooksAPI.search(query, 20).then(books =>{
-        console.log(JSON.stringify(books))
-      this.setState({ books })
+      books.forEach(book => {
+        booksOnShelf.forEach(x => {
+          if (x.id === book.id){
+            book.shelf = x.shelf
+          }
+        })
+      })
+      this.setState({ searchResults: books })
     })
   }
 
-  updateQuery = (query) => {
+  updateQuery = (query, booksOnShelf) => {
     this.setState({ 
-        query: query.trim()
-     }, this.searchBooks(query))
+        query: query
+     }, this.searchBooks(query, booksOnShelf))
+  }
+
+  updateShelf = (book, shelf) => {
+    book.shelf = shelf
+    this.setState(state => {
+      this.setState({searchResults: state.searchResults})
+    })
   }
 
   render() {
-    const { moveBook } = this.props
-    const { query, books } = this.state
+    const { moveBook, booksOnShelf} = this.props
+    const { query, searchResults } = this.state
 
     return (
         
@@ -48,20 +61,21 @@ class SearchBooks extends Component {
                     type="text"
                     placeholder="Search by title or author" 
                     value={query}
-                    onChange={(event) => this.updateQuery(event.target.value)}
+                    onChange={(event) => this.updateQuery(event.target.value, booksOnShelf)}
                 />
 
               </div>
             </div>
             <div className="search-books-results">
               <ol className="books-grid">
-                {books.map(book => (
+                {searchResults && searchResults.map(book => (
                     <li key={book.id}>
                         <div className="book">
                         <div className="book-top">
                             <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
                             <div className="book-shelf-changer">
                             <select value={book.shelf? book.shelf: "none"} onChange={(event) =>{
+                                this.updateShelf(book, event.target.value)
                                 moveBook(book, event.target.value)
                             }}>
                                 <option value="none" disabled>Move to...</option>
