@@ -17,9 +17,8 @@ class BooksApp extends React.Component {
 
   moveBook = (book, shelf) => {
     BooksAPI.update(book, shelf).then(() =>{
-      BooksAPI.getAll().then((books) => {
-      this.setState({ books })
-    })
+      book.shelf = shelf;
+      this.setState({books: this.state.books.filter((b) => b.id !== book.id).concat(book)});
     })
   }
 
